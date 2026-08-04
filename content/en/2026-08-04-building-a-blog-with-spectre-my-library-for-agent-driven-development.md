@@ -2,7 +2,7 @@
 title: "Building a Blog with Spectre: My Library for Agent-Driven Development"
 slug: "building-a-blog-with-spectre-my-library-for-agent-driven-development"
 lang: "en"
-status: draft
+status: published
 date: 2026-08-04
 updated: 2026-08-04
 category: "Software Development"
