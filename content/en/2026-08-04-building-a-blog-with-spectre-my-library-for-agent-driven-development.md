@@ -12,8 +12,6 @@ seo_description: "How I built a Git-backed blog agent with Spectre, keeping mode
 cover_alt: "A blog agent built around an explicit OTP runtime, connected to Markdown files, Git history, model reasoning, and controlled publishing"
 ---
 
-# Building a Blog Agent with Spectre, Not Around a Magic Loop
-
 I did not build Spectre because calling an LLM from Elixir was difficult.
 
 That part is easy. Send a request, pass some messages, describe a few functions and wait for the model to return a tool call.
