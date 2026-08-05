@@ -12,8 +12,6 @@ seo_description: "An introduction to Spectre: how to think about subjects, insta
 cover_alt: "A first Spectre agent: a subject resolved by the host, an OTP instance owning state, and turns crossing a visible boundary"
 ---
 
-# Getting Started with Spectre: Your First Agent Is Not a Loop
-
 Most agent tutorials start with a model call. You send a prompt, describe two tools, print the answer, and the demo works.
 
 Spectre asks you to start somewhere else.
