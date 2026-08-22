@@ -8,313 +8,248 @@ updated: 2026-08-22
 category: "Sviluppo software"
 tags: ["BEAM VM","Elixir","Erlang","OTP","AI agents","fault tolerance","concurrency","Spectre"]
 seo_title: "BEAM VM ed Elixir per agenti AI affidabili"
-seo_description: "La BEAM non è nata per l'AI, ma processi isolati, supervision, message passing e OTP la rendono una base ideale per agenti e sistemi AI seri."
-cover_alt: "Un Agent AI eseguito come insieme di processi Elixir supervisionati sulla BEAM VM"
+seo_description: "La BEAM non è nata per l'AI, ma processi isolati, supervision, messaggi e OTP la rendono una base ideale per agenti e sistemi AI seri."
+cover_alt: "Un Agent AI eseguito attraverso processi Elixir supervisionati sulla BEAM VM"
 ---
 
-Quando si parla di intelligenza artificiale, la scelta tecnologica sembra quasi
-automatica.
-
-Python per il modello. CUDA per la GPU. Un server di inferenza, qualche API e
-un framework che mette insieme prompt e tool.
-
-Ha perfettamente senso se il problema che stiamo guardando è addestrare o
-servire un modello. Ma un Agent serio non coincide con il modello che utilizza.
-Il modello è soltanto uno dei suoi componenti e, spesso, nemmeno quello che
-rimane attivo più a lungo.
-
-Un Agent esiste prima della chiamata al modello e deve continuare a esistere
-dopo. Riceve messaggi, conserva stato, aspetta risposte dalla rete, avvia
-lavori, gestisce timeout, coordina tool, chiede approvazioni, produce effetti e
-deve sapere cosa fare quando una di queste operazioni fallisce.
-
-La parte difficile comincia proprio quando la demo del prompt finisce.
-
-Ed è qui che una macchina virtuale nata decenni prima dell'attuale ondata di AI
-diventa sorprendentemente moderna.
-
-La BEAM non è stata progettata per i Large Language Model. Erlang nacque in
-Ericsson e [Erlang/OTP fu costruito e collaudato per applicazioni distribuite e
-tolleranti ai guasti](https://www.erlang.org/about), in un mondo dove una parte
-del sistema poteva cadere senza interrompere tutto il servizio.
-
-Non era intelligenza artificiale. Erano telecomunicazioni.
-
-Ma il problema aveva già una forma familiare: moltissime attività concorrenti,
-stato che vive nel tempo, comunicazione asincrona, rete inaffidabile, errori
-parziali e necessità di recuperare senza spegnere l'intero sistema.
-
-È difficile immaginare una descrizione più vicina a un runtime moderno per
-agenti.
-
-## Un Agent non è una funzione
-
-Molti esempi di agenti iniziano con una funzione che riceve una stringa, chiama
-un modello e restituisce una risposta.
-
-È un ottimo modo per spiegare il primo esempio. Diventa però un modello mentale
-pericoloso quando il sistema cresce.
-
-Immaginiamo un Agent che sta analizzando documenti per un cliente. Nel
-frattempo riceve una nuova istruzione, una chiamata al modello comincia a
-produrre token in streaming, un tool esterno va in timeout e una policy richiede
-l'approvazione di una persona. Un altro lavoro pianificato deve partire tra
-dieci minuti, mentre quello precedente deve poter essere sospeso o annullato.
-
-Questa non è più una funzione. È un piccolo sistema concorrente.
-
-~~~text
-Agent Instance
-  ├── conversazione e stato
-  ├── Run attivo
-  ├── Work o Vigil in background
-  ├── Invocation verso un modello
-  ├── Effect in attesa di policy
-  └── timer, messaggi e notifiche
-~~~
-
-Non significa che ogni voce debba sempre corrispondere a un processo distinto.
-Significa che esistono proprietari, lifecycle e failure domain differenti.
-
-La BEAM ci offre un modo naturale per rappresentarli senza trasformare tutto in
-callback annidate, thread condivisi o una collezione di record in un database
-che qualche worker deve continuamente interpretare.
-
-## I processi BEAM sono confini di ownership
-
-Un processo Erlang non è un processo del sistema operativo. È un'entità molto
-più leggera, gestita direttamente dalla VM. La documentazione ufficiale
-descrive i [processi Erlang come leggeri e adatti a sistemi con quantità molto
-elevate di processi concorrenti](https://www.erlang.org/doc/system/eff_guide_processes.html).
-
-Ogni processo possiede il proprio stato e la propria mailbox. A livello del
-modello di programmazione, comunica con gli altri attraverso messaggi invece
-di modificare direttamente la loro memoria.
-
-Questo cambia profondamente il modo in cui possiamo costruire un Agent.
-
-Un'istanza può possedere lo stato canonico di uno specifico Agent e di uno
-specifico Subject. Le richieste arrivano come messaggi. Un lavoro temporaneo
-può essere avviato sotto un altro processo. Il proprietario riceve il risultato
-e decide se è ancora valido prima di applicarlo.
-
-Non abbiamo soltanto concorrenza. Abbiamo un confine chiaro intorno alla
-domanda più importante di un sistema stateful:
-
-> Chi possiede questo stato e chi può modificarlo?
-
-In Elixir, [`GenServer`](https://hexdocs.pm/elixir/GenServer.html) fornisce una
-forma standard per costruire questi proprietari. Può mantenere stato, ricevere
-chiamate sincrone e messaggi asincroni, gestire timeout, partecipare a una
-supervision tree ed essere osservato con strumenti comuni.
-
-Naturalmente non bisogna mettere qualsiasi funzione dentro un GenServer. La
-stessa documentazione di Elixir avverte che un processo deve modellare una
-proprietà runtime, come stato mutabile, concorrenza o fallimento, non essere
-usato soltanto per organizzare codice.
-
-Un Agent long-running possiede esattamente queste proprietà. Non stiamo
-inventando processi perché ci piace OTP. Stiamo dando una forma esplicita a
-qualcosa che nel sistema esiste già.
-
-## La supervision cambia il modo di pensare agli errori
-
-Un provider LLM può andare in timeout. Un parser può ricevere una risposta
-incompleta. Un'integrazione può restituire dati non validi. Un processo che
-gestisce uno stream può terminare mentre l'utente sta inviando una nuova
-istruzione.
-
-In molti runtime, la gestione di questi casi viene dispersa tra `try`, retry,
-callback e code di messaggi. Con OTP, il fallimento è una parte dichiarata
-dell'architettura.
-
-Un [Supervisor](https://hexdocs.pm/elixir/Supervisor.html) sa quali processi
-deve avviare, fermare e riavviare. Una supervision tree descrive quali
-componenti dipendono dagli altri e quale parte deve essere ricostruita quando
-qualcosa termina in modo anomalo. Un
-[`DynamicSupervisor`](https://hexdocs.pm/elixir/DynamicSupervisor.html) può
-gestire figli creati su richiesta, mentre un
-[`Task.Supervisor`](https://hexdocs.pm/elixir/Task.Supervisor.html) permette di
-isolare lavori temporanei senza lasciarli fuori dal lifecycle
-dell'applicazione.
-
-Questo non significa che "let it crash" voglia dire ignorare gli errori.
-Significa separare il codice che svolge il lavoro dal codice che decide come il
-sistema deve recuperare. Il componente può fallire in modo chiaro. Il suo
-supervisore contiene il danno e applica una strategia conosciuta.
-
-Per gli agenti questa separazione è preziosa. Una chiamata difettosa al modello
-non dovrebbe abbattere tutte le conversazioni. Un Work fallito non dovrebbe
-corrompere l'Instance che lo ha avviato. Un adapter esterno instabile non
-dovrebbe diventare il proprietario implicito del lifecycle dell'Agent.
-
-Ma anche qui bisogna essere precisi: riavvio non significa recovery.
-
-Un Supervisor può far ripartire un processo, ma non può inventare lo stato che
-non abbiamo salvato. Durabilità, checkpoint, idempotenza e riconciliazione
-rimangono responsabilità dell'architettura applicativa.
-
-La BEAM fornisce il meccanismo per contenere il guasto. Un runtime serio deve
-anche sapere da quale verità durevole ripartire.
-
-## Scheduling e garbage collection adatti alla concorrenza
-
-Gli agenti passano moltissimo tempo ad aspettare.
-
-Aspettano il provider del modello, il database, un'API, l'approvazione di una
-persona, un messaggio dell'utente o il prossimo intervallo di un'attività
-periodica. Il problema non è soltanto eseguire rapidamente una funzione. È
-mantenere molte attività vive senza permettere a una di bloccare tutte le
-altre.
-
-La BEAM distribuisce i processi eseguibili tra più scheduler e usa un budget di
-riduzioni per forzare il cambio di contesto dopo una quantità limitata di
-lavoro. La VM è progettata affinché moltissimi processi possano avanzare senza
-dipendere da un singolo event loop applicativo.
-
-Anche la memoria segue la stessa filosofia. Erlang utilizza un
-[garbage collector generazionale per processo](https://www.erlang.org/doc/apps/erts/garbagecollection.html).
-Una raccolta della memoria riguarda normalmente il processo proprietario di
-quell'heap, invece di imporre ogni volta una pausa globale a tutte le attività
-dell'applicazione.
-
-Per un runtime che ospita molte conversazioni e lavori indipendenti, questo è
-un vantaggio strutturale. Un'Instance che crea molti dati temporanei non deve
-necessariamente trascinare tutte le altre nella propria raccolta della memoria.
-
-Non significa che la BEAM renda qualsiasi carico automaticamente veloce.
-Significa che è stata ottimizzata per mantenere reattivo un sistema composto da
-molte attività concorrenti, che è una descrizione molto più vicina a un sistema
-di agenti che a un singolo benchmark numerico.
-
-## Message passing come interfaccia di controllo
-
-La comunicazione tra processi Erlang avviene tramite
-[segnali e messaggi asincroni](https://www.erlang.org/doc/system/ref_man_processes.html).
-Ogni processo riceve i messaggi nella propria mailbox e decide come
-interpretarli.
-
-Per un Agent questa non è soltanto un'implementazione interna. Può diventare il
-linguaggio naturale del controllo operativo.
-
-Un utente può inviare nuove informazioni mentre un Work è in esecuzione. Il
-runtime può chiedere al lavoro di sospendersi, aggiornare il contesto e
-riprendere. Un processo può monitorare un worker e ricevere un segnale quando
-termina. Un timer può generare il prossimo passo di un Vigil. Un riferimento
-unico può distinguere il risultato valido da una risposta tardiva appartenente
-a un tentativo ormai sostituito.
-
-La BEAM offre già mailbox, monitor, link, timer e identità di processo. Non
-risolve automaticamente il protocollo, ma ci permette di costruirlo con
-primitive che condividono la stessa semantica runtime.
-
-Questa distinzione è importante. Una risposta tardiva di un modello non deve
-essere applicata soltanto perché è finalmente arrivata. Deve appartenere
-ancora al Run corretto, al tentativo corretto e alla revisione corretta.
-
-La VM ci dà il trasporto e l'isolamento. Il runtime dell'Agent aggiunge fencing,
-revisioni e regole di commit.
-
-## Elixir rende questa macchina utilizzabile
-
-La BEAM è la fondazione, ma Elixir rende piacevole costruirci sopra sistemi
-complessi.
-
-Pattern matching, dati immutabili, protocolli e pipeline permettono di
-descrivere transizioni senza nascondere continuamente lo stato dentro oggetti
-mutabili. Le macro consentono di creare DSL leggibili che a compile time
-diventano strutture verificabili, invece di lasciare che il comportamento
-esista soltanto dentro stringhe e configurazioni informali.
-
-Questo è particolarmente utile per un Agent. Flow, policy, action e skill
-possono essere letti come una mappa del comportamento, ma compilati in una
-forma precisa che il runtime può ispezionare.
-
-Elixir porta inoltre un ecosistema maturo per HTTP, database, telemetry,
-streaming e interfacce realtime. Phoenix e LiveView possono mostrare lo stato
-di un Agent mentre i processi che lo possiedono continuano a vivere fuori dal
-ciclo di rendering della pagina.
-
-E non è vero che Elixir debba rimanere completamente fuori dalla parte
-numerica. [Nx](https://hexdocs.pm/nx/Nx.html) offre tensori e calcolo numerico,
-mentre [`Nx.Serving`](https://hexdocs.pm/nx/Nx.Serving.html) permette di
-organizzare inferenza e batching. EXLA, Axon e Bumblebee possono portare
-classificatori, embedding e alcuni modelli direttamente nell'ecosistema BEAM.
-
-Il punto, però, non è dimostrare che ogni modello debba essere eseguito in
-Elixir.
-
-Il punto è che Elixir può essere il control plane che coordina modelli locali,
-GPU, servizi Python e provider remoti senza cedere a questi componenti la
-proprietà dell'Agent.
-
-## Dove la BEAM non è magia
-
-Python e l'ecosistema CUDA rimangono la scelta dominante per addestrare grandi
-modelli e sviluppare nuove architetture numeriche. Un calcolo pesante non
-diventa improvvisamente economico perché viene avviato da un processo Elixir.
-
-Lavoro CPU-bound prolungato, NIF scritte male e chiamate native bloccanti
-possono danneggiare la reattività della VM. Questi carichi devono essere
-spostati su dirty scheduler, porte, librerie native progettate con attenzione o
-servizi separati. Anche una mailbox può crescere senza limite se il protocollo
-non introduce backpressure e limiti.
-
-La distribuzione tra nodi BEAM è potente, ma non sostituisce una strategia per
-partizioni di rete, sicurezza, consistenza e deployment. E, come abbiamo visto,
-una supervision tree non sostituisce un database o un checkpoint durevole.
-
-Questi non sono argomenti contro la BEAM. Sono il motivo per cui è importante
-distinguere la VM dall'architettura costruita sopra di essa.
-
-La BEAM offre primitive straordinariamente adatte. Non prende al posto nostro
-le decisioni di ownership, autorità, persistenza e recovery.
-
-## Perché ho scelto Elixir per Spectre
-
-È esattamente per questo che ho scelto Elixir per costruire
+Quando ho iniziato a costruire Spectre, scegliere Elixir per un progetto legato
+all'intelligenza artificiale sembrava quasi una provocazione.
+
+Nel mondo AI il percorso più comune è già tracciato. Si parte da Python, si
+arriva a CUDA quando serve una GPU e si aggiunge un server per esporre il
+modello. Elixir compare raramente in questa conversazione. Quando compare, di
+solito qualcuno domanda perché complicarsi la vita usando un linguaggio che
+non si trova al centro dell'ecosistema del machine learning.
+
+All'inizio è una domanda legittima. Se dovessi addestrare un nuovo Large
+Language Model, probabilmente non sceglierei Elixir come primo strumento. Ma
+mentre lavoravo a Spectre mi sono accorto che il modello era soltanto una parte
+del problema. Era la parte più visibile, non necessariamente la più difficile.
+
+Un Agent reale deve continuare a esistere quando la chiamata al modello è
+finita. Deve ricordare in quale stato si trova, ricevere nuove istruzioni,
+aspettare servizi esterni, fermare un lavoro, riprenderlo e capire se una
+risposta arrivata in ritardo è ancora valida. Se può compiere azioni, deve
+anche sapere chi ha il diritto di autorizzarle e cosa fare quando qualcosa
+fallisce a metà.
+
+A quel punto la domanda non è più soltanto quale modello usare. La domanda
+diventa quale tipo di sistema vogliamo costruire intorno al modello.
+
+Ed è proprio lì che Elixir e la BEAM hanno cominciato a sembrarmi non una
+scelta insolita, ma una scelta quasi ovvia.
+
+## Il momento in cui un Agent smette di essere una funzione
+
+Immaginiamo un Agent che sta analizzando alcuni documenti per un cliente. Ha
+già avviato una ricerca, il modello sta producendo una risposta e un servizio
+esterno impiega più tempo del previsto. Nel frattempo il cliente invia un
+nuovo messaggio e aggiunge un dettaglio importante che cambia il senso del
+lavoro.
+
+L'Agent dovrebbe poter ricevere quel messaggio senza aspettare che tutto il
+resto finisca. Potrebbe dover sospendere la ricerca, aggiornare il contesto e
+riprendere da un punto coerente. Se nel frattempo arriva la vecchia risposta
+del servizio esterno, non dovrebbe applicarla ciecamente soltanto perché è
+arrivata.
+
+In una demo possiamo rappresentare tutto con una funzione che riceve una
+stringa e restituisce una risposta. In un prodotto vero quella funzione si
+trasforma presto in un insieme di attività che vivono nello stesso momento.
+Alcune durano pochi secondi, altre possono rimanere attive per ore. Alcune
+aspettano la rete, altre aspettano una persona. Ognuna può fallire senza che
+per questo debba sparire l'intero Agent.
+
+Questa forma del problema mi ricordava molto meno una semplice applicazione AI
+e molto più un sistema concorrente.
+
+La cosa interessante è che la BEAM è nata per affrontare un problema simile
+molto prima che parlassimo di agenti. Erlang fu sviluppato in Ericsson per
+costruire sistemi che dovevano rimanere disponibili anche quando una loro
+parte smetteva di funzionare. In seguito Erlang e OTP sono stati usati per
+applicazioni distribuite e tolleranti ai guasti in cui fermare tutto non era
+una soluzione accettabile. La [storia ufficiale di Erlang](https://www.erlang.org/about)
+nasce dalle telecomunicazioni, non dall'intelligenza artificiale.
+
+Eppure le telecomunicazioni avevano già molte delle difficoltà che oggi
+ritroviamo negli agenti. Esistevano tante attività contemporanee, messaggi che
+potevano arrivare in momenti diversi, stato che doveva vivere nel tempo e
+guasti che non potevano propagarsi ovunque.
+
+Il nome del problema è cambiato. La sua forma, molto meno.
+
+## Un processo piccolo può dare un confine enorme
+
+La prima cosa che colpisce della BEAM è il suo modo di trattare i processi.
+
+Un processo Erlang non è un pesante processo del sistema operativo. È una
+piccola unità gestita dalla macchina virtuale, con una propria identità, uno
+stato e una casella in cui riceve messaggi. La documentazione di Erlang spiega
+che questi [processi sono leggeri e pensati per esistere in grandi quantità](https://www.erlang.org/doc/system/eff_guide_processes.html).
+
+La parte importante, almeno per me, non è soltanto quante migliaia di processi
+possiamo avviare. È il confine che ogni processo crea.
+
+Se un processo possiede lo stato di un Agent, gli altri componenti non entrano
+dentro quello stato per modificarlo quando vogliono. Gli inviano un messaggio.
+Il proprietario riceve la richiesta, controlla se ha ancora senso e decide
+come cambiare lo stato.
+
+Questo rende molto concreta una domanda che in tanti sistemi rimane nascosta:
+chi possiede davvero lo stato?
+
+Con [`GenServer`](https://hexdocs.pm/elixir/GenServer.html), Elixir offre una
+forma comune per costruire questo tipo di proprietario. Non serve trasformare
+ogni funzione in un processo. Ha senso farlo quando qualcosa deve vivere nel
+tempo, ricevere eventi, proteggere uno stato o rappresentare un confine di
+fallimento. Un Agent che può essere interrotto, aggiornato e ripreso possiede
+esattamente queste caratteristiche.
+
+Un lavoro temporaneo può vivere in un altro processo. Se quel lavoro fallisce,
+il processo che possiede l'Agent non deve perdere il proprio stato. Se il
+lavoro termina correttamente, invia il risultato al proprietario, che può
+ancora decidere se accettarlo. Questa separazione sembra un dettaglio tecnico,
+ma cambia completamente il modo in cui si ragiona sul sistema.
+
+Non stiamo più sperando che tutte le operazioni finiscano nel giusto ordine.
+Stiamo assegnando a ogni parte una responsabilità chiara.
+
+## Fallire senza trascinare tutto con sé
+
+Prima o poi un provider del modello va in timeout. Una connessione si chiude
+durante lo streaming. Un parser incontra una risposta che non si aspettava.
+Non sono casi eccezionali. Sono il normale ambiente in cui vive un Agent.
+
+OTP porta il fallimento dentro il disegno dell'applicazione. Un
+[`Supervisor`](https://hexdocs.pm/elixir/Supervisor.html) conosce i processi
+che gli sono affidati e sa come reagire quando uno di essi termina. Non siamo
+costretti a spargere la stessa logica di recupero in ogni funzione. Possiamo
+decidere in un punto chi deve essere riavviato e quale parte del sistema deve
+rimanere intatta.
+
+La famosa idea di lasciare che un processo fallisca viene spesso raccontata
+male. Non significa ignorare gli errori. Significa evitare che un componente
+mezzo rotto continui a nascondere uno stato incoerente. Il processo termina in
+modo chiaro e il livello che lo supervisiona decide come ricostruirlo.
+
+Naturalmente riavviare non significa recuperare tutto per magia. Se uno stato
+importante non è mai stato salvato, un Supervisor non può inventarlo. Un
+sistema serio ha ancora bisogno di checkpoint, operazioni che possano essere
+ripetute senza produrre danni e una verità durevole da cui ripartire.
+
+Però la BEAM ci dà qualcosa di prezioso ancora prima della persistenza. Ci
+permette di contenere il guasto. Una chiamata al modello che fallisce non deve
+abbattere tutte le conversazioni. Un'integrazione instabile non deve diventare
+il centro da cui dipende la vita dell'Agent.
+
+Quando molti agenti lavorano nello stesso sistema, questa proprietà smette di
+essere elegante teoria e diventa sopravvivenza operativa.
+
+## La concorrenza che serve davvero agli agenti
+
+Gran parte della vita di un Agent viene trascorsa aspettando. Aspetta il
+modello, una ricerca nel database, un'API, un nuovo messaggio o
+l'approvazione di una persona. Mentre un Agent aspetta, gli altri devono poter
+continuare a lavorare.
+
+La BEAM distribuisce i processi pronti tra i suoi scheduler e misura il lavoro
+attraverso le riduzioni. Dopo una quantità limitata di lavoro, un processo
+lascia spazio agli altri. Non dobbiamo costruire manualmente un unico ciclo
+applicativo dal quale dipende la reattività di tutto il sistema.
+
+Anche la memoria segue un'idea simile. Erlang usa un
+[garbage collector generazionale per ogni processo](https://www.erlang.org/doc/apps/erts/garbagecollection.html).
+Quando un processo deve ripulire il proprio spazio, normalmente non impone la
+stessa pausa a tutte le altre attività. Un Agent che ha creato molti dati
+temporanei non deve necessariamente bloccare migliaia di conversazioni che non
+c'entrano nulla.
+
+Questo non rende la BEAM la macchina più veloce per ogni tipo di calcolo. Non è
+quello il punto. Il suo talento è mantenere vivo e reattivo un sistema composto
+da tantissime attività indipendenti. Per gli agenti è spesso molto più utile
+di vincere un confronto su una singola funzione eseguita in isolamento.
+
+Il passaggio di messaggi completa questa idea. Se un utente aggiunge una nuova
+informazione mentre un lavoro è ancora attivo, il messaggio può raggiungere il
+processo che possiede l'Agent. Un monitor può accorgersi che un lavoro è
+terminato. Un timer può risvegliare un'attività periodica. Una risposta
+arrivata tardi può essere confrontata con il tentativo che l'aveva generata e
+scartata se quel tentativo non è più valido.
+
+La BEAM non decide da sola le regole del nostro Agent. Ci offre però un
+linguaggio runtime coerente per esprimerle. Stato, messaggi, tempo e fallimenti
+non sembrano pezzi provenienti da sistemi differenti che dobbiamo incollare a
+forza.
+
+## Elixir rende questa macchina comprensibile
+
+La BEAM è la base, ma Elixir è ciò che mi ha fatto desiderare di costruirci
+sopra.
+
+Il pattern matching rende leggibili molti passaggi che altrimenti diventano
+una successione di controlli. I dati immutabili aiutano a vedere una
+transizione come il passaggio da uno stato a un altro, invece di nascondere
+modifiche in oggetti condivisi. Le macro permettono di creare un linguaggio
+specifico per il problema senza ridurre tutto a stringhe dentro un prompt.
+
+Per un Agent questa leggibilità conta molto. Un comportamento dovrebbe poter
+essere letto dal programmatore. Dovrebbe essere chiaro quale evento lo attiva,
+quale lavoro avvia e quale azione richiede autorità. Elixir consente di
+scrivere codice che rimane vicino all'idea che descrive, ma continua a essere
+codice verificabile dal runtime.
+
+Poi c'è l'ecosistema. Elixir è già molto forte quando servono connessioni HTTP,
+database, streaming, telemetria e interfacce in tempo reale. Con
+[Nx](https://hexdocs.pm/nx/Nx.html) e
+[`Nx.Serving`](https://hexdocs.pm/nx/Nx.Serving.html) può occuparsi anche di
+tensori, inferenza e richieste raggruppate. Alcuni classificatori, embedding e
+modelli possono quindi vivere direttamente nella BEAM.
+
+Non credo però che il valore di Elixir dipenda dal sostituire Python. Python e
+CUDA rimangono strumenti eccellenti per addestrare modelli ed eseguire calcoli
+numerici pesanti. Elixir può coordinare un servizio Python, una GPU locale o
+un provider remoto senza consegnare a nessuno di questi la proprietà
+dell'Agent.
+
+Anche la BEAM ha limiti reali. Un calcolo lungo che occupa la CPU può ridurre
+la reattività. Una funzione nativa scritta male può bloccare scheduler che
+dovrebbero servire altri processi. Una casella di messaggi può crescere troppo
+se nessuno limita il ritmo dei messaggi in arrivo. La distribuzione tra
+nodi non risolve automaticamente sicurezza, consistenza o problemi di rete.
+
+Questi limiti non indeboliscono la scelta. La rendono più chiara. La BEAM è un
+ambiente eccellente per gestire il lifecycle e coordinare il lavoro. Il calcolo
+specializzato può rimanere dove viene eseguito meglio.
+
+## Il motivo per cui Spectre è scritto in Elixir
+
+È esattamente questo il ragionamento che mi ha portato a scegliere Elixir per
 [Spectre 0.3.2](https://github.com/elchemista/spectre/tree/0.3.2).
 
-Non perché Elixir fosse il linguaggio più popolare nel mondo AI e nemmeno
-perché volessi riscrivere in Elixir ciò che Python sa già fare bene.
+Non volevo costruire un altro contenitore intorno a un prompt. Volevo un
+runtime in cui un Agent avesse un'identità, uno stato e un lifecycle che non
+dipendessero dall'umore del modello. In Spectre una Instance possiede lo stato
+canonico. I lavori possono essere avviati e osservati senza diventare i
+proprietari dell'Agent. Un Effect può descrivere un'azione, ma è la Policy,
+insieme all'host, a decidere se quella azione può davvero attraversare il
+confine verso il mondo esterno.
 
-L'ho scelto perché un modello è probabilistico, mentre il sistema che gli
-concede stato e autorità non può essere soltanto probabilistico.
+Molte di queste idee sono nate pensando al controllo e alla sicurezza, ma OTP
+ha dato loro una forma naturale. Continuava a riportarmi alle domande giuste.
+Chi possiede questo stato? Chi supervisiona questo processo? Cosa succede se
+il risultato arriva troppo tardi? Quale parte può fallire senza corrompere il
+resto?
 
-In Spectre, un'Instance possiede lo stato canonico. Run, Work, Vigil e
-Invocation hanno lifecycle espliciti. Un Effect descrive un'azione, ma il
-modello non la esegue. Una Policy decide deterministicamente quali passaggi
-sono necessari e l'host conserva l'autorità finale.
+Quando penso oggi alla scelta di Elixir, non penso prima di tutto alla sintassi
+o alle prestazioni. Penso al modo in cui la BEAM obbliga il sistema ad avere
+confini visibili.
 
-Queste idee non sono state aggiunte nonostante OTP. Sono diventate naturali
-proprio perché OTP spinge a chiedere chi possiede un processo, chi lo
-supervisiona, come comunica e cosa succede quando fallisce.
+La BEAM non è nata per l'intelligenza artificiale. Non conosce prompt, modelli
+o agenti. È nata per tenere vivi sistemi concorrenti mentre alcune loro parti
+falliscono.
 
-La BEAM fornisce la fisica del sistema. Spectre prova a costruirci sopra le
-leggi costituzionali di un Agent.
+Ma appena un Agent smette di essere una demo e deve restare vivo davvero,
+inizia ad avere esattamente quel problema.
 
-## La VM sotto il modello conta
-
-La BEAM non è un framework AI. Ed è proprio questo a renderla così interessante
-per l'AI.
-
-Non prova a essere il modello, il database vettoriale, il provider o il tool.
-Offre un ambiente in cui tutti questi componenti possono essere coordinati
-senza diventare il centro incontrollato del sistema.
-
-Il modello può cambiare. Il provider può fallire. Un tool può andare in
-timeout. Un lavoro può essere annullato. L'Agent deve comunque conservare
-identità, stato, lifecycle e autorità.
-
-Python risponde molto bene alla domanda: come addestro ed eseguo questo
-modello?
-
-Elixir e la BEAM rispondono a un'altra domanda:
-
-> Come faccio a tenere vivi molti sistemi intelligenti, concorrenti e
-> imperfetti, lasciandoli fallire senza perdere il controllo dell'applicazione?
-
-La BEAM non è nata per gli agenti AI.
-
-Ma più seri diventano gli agenti, più sembra che li stesse aspettando da
-sempre.
+Per questo Elixir, nel mondo degli agenti seri, mi sembra ogni giorno meno una
+scelta strana e sempre più la scelta giusta.
