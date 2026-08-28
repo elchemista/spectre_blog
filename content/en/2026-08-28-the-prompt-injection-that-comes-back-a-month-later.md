@@ -2,7 +2,7 @@
 title: "The Prompt Injection That Comes Back a Month Later"
 slug: "the-prompt-injection-that-comes-back-a-month-later"
 lang: "en"
-status: draft
+status: published
 date: 2026-08-28
 updated: 2026-08-28
 category: "AI Security"
