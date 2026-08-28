@@ -44,47 +44,45 @@ ACME e quel testo torna fuori come un suo vecchio ricordo.
 
 La pagina malevola magari non esiste neanche più. L'attacco invece sì.
 
-## Una memoria non è una cartella piena di frasi
+## Il database ha fatto esattamente il suo lavoro
 
-Quando ho cominciato a lavorare a
-[Spectre Mnemonic](https://github.com/elchemista/spectre_mnemonic), il punto di
-partenza non era scegliere un vector database. Quello viene dopo. Prima c'era
-una domanda più scomoda: cosa significa, per un Agent, ricordare qualcosa?
+Se la frase nascosta viene trasformata in un embedding, il vector database non
+vede niente di sospetto. Vede ACME, fatture, pagamenti e un IBAN. Alla domanda
+"come paghiamo questa fattura?" potrebbe restituire proprio quel frammento con
+un ottimo punteggio.
 
-Mettere ogni conversazione, pagina e risultato di un tool dentro una collezione
-di embedding è sicuramente memoria nel senso più largo del termine. Quando
-arriva una nuova richiesta cerchi i pezzi semanticamente vicini, li rimetti nel
-prompt e lasci decidere al modello. Funziona, spesso anche molto bene. Però in
-quel contenitore finiscono sullo stesso piano cose completamente diverse.
+Tecnicamente è un risultato corretto. Semanticamente è vicino alla domanda. Il
+guaio comincia quando usiamo quella vicinanza come se fosse una misura di
+verità.
 
-Un messaggio appena ricevuto, una decisione approvata sei mesi fa, una
-preferenza detta una volta, il risultato di un tool, una procedura verificata e
-una frase estratta da una pagina sconosciuta diventano tutti testo recuperabile.
-La similarità può dirci che due frasi parlano dello stesso argomento. Non può
-dirci che una delle due è vera.
+Dentro la stessa collezione possono esserci un messaggio appena ricevuto, una
+decisione approvata sei mesi fa, una preferenza detta una volta, il risultato di
+un tool, una procedura verificata e una frase estratta da una pagina sconosciuta.
+Per l'indice sono tutti documenti recuperabili. Per un Agent non dovrebbero
+avere lo stesso peso e soprattutto non dovrebbero avere la stessa autorità.
 
-Nella mente umana non sembra funzionare tutto come un unico archivio. Abbiamo
-un'attenzione limitata, tratteniamo alcune cose abbastanza a lungo da usarle,
-ricostruiamo episodi, rinforziamo certi ricordi e lentamente ricaviamo modelli
-più generali dall'esperienza. Dimentichiamo anche molto, e per fortuna.
+L'idea della mente umana che mi è rimasta più in testa non riguarda la sua
+capacità. Riguarda le sue velocità. Tratteniamo qualcosa abbastanza a lungo da
+usarlo adesso, ricostruiamo episodi, rinforziamo certi collegamenti e soltanto
+col tempo ricaviamo conoscenza più stabile. Nel frattempo perdiamo dettagli,
+cambiamo idea e dimentichiamo parecchio.
 
-Una delle idee che mi ha influenzato è quella dei
-[Complementary Learning Systems](https://pubmed.ncbi.nlm.nih.gov/7624455/).
-Semplificando parecchio, propone un sistema capace di acquisire rapidamente
-esperienze specifiche e un altro che integra più lentamente regolarità e
-conoscenza. Anche il consolidamento della memoria viene studiato come il
-passaggio da una traccia inizialmente fragile a una forma più stabile
-[nel tempo](https://pmc.ncbi.nlm.nih.gov/articles/PMC4526749/).
+I [Complementary Learning
+Systems](https://pubmed.ncbi.nlm.nih.gov/7624455/)
+descrivono, semplificando molto, un apprendimento rapido delle esperienze
+specifiche e un'integrazione più lenta delle regolarità. Il consolidamento
+studia proprio il passaggio da una traccia inizialmente fragile a qualcosa di
+più stabile [nel tempo](https://pmc.ncbi.nlm.nih.gov/articles/PMC4526749/).
 
-Mnemonic non è un modello del cervello e non prova a fingere di esserlo. Mi
-interessava però quella separazione. Una cosa appena successa deve diventare
-disponibile subito, altrimenti l'Agent non riesce nemmeno a continuare il
-lavoro. Questo non significa che debba diventare immediatamente conoscenza
-stabile.
+Non sto dicendo che ETS sia un ippocampo e un log append-only una neocorteccia.
+Sarebbe una metafora portata troppo lontano. La separazione utile è un'altra:
+rendere subito disponibile ciò che è appena successo senza promuoverlo subito
+a conoscenza.
 
-Nel modulo principale avevo riassunto l'idea con una frase che ancora oggi mi
-sembra la descrizione più corretta del progetto: Mnemonic non è il database di
-tutto. È un'attenzione viva che lentamente diventa memoria organizzata.
+[Spectre Mnemonic](https://github.com/elchemista/spectre_mnemonic) lavora su
+queste due velocità. Nel `moduledoc` c'è una frase che contiene quasi tutta
+l'architettura: non è un database di tutto, è un focus vivo che lentamente
+diventa memoria organizzata.
 
 ## Ricordare in fretta, capire lentamente
 
@@ -117,8 +115,8 @@ più stabili e curate per problemi che ritornano. Più lentamente ancora, la
 conoscenza progressiva può conservare fatti, procedure e skill che non ha senso
 ricostruire ogni volta partendo dall'intera cronologia.
 
-Immagina tre deploy diversi. Nel primo il provider dei pagamenti va in timeout.
-Nel secondo un retry cieco produce un duplicato. Nel terzo l'applicazione prima
+Al primo deploy il provider dei pagamenti va in timeout. Nel secondo un retry
+cieco produce un duplicato. Nel terzo l'applicazione prima
 riconcilia lo stato remoto e poi decide se riprovare. La memoria veloce conserva
 i singoli eventi mentre accadono. Le associazioni mantengono insieme tool call,
 errori e decisioni. Gli Episodes ricostruiscono i tre incidenti. Un'Observation
@@ -136,15 +134,13 @@ mettere davanti i Mental Models curati, poi le Observations e infine i ricordi
 grezzi, mantenendo fonti e citazioni separabili. Nemmeno `reflect` scrive la
 risposta finale. Prepara l'evidenza con cui un altro layer potrà ragionare.
 
-Questa connessione tra memoria veloce e lenta è la parte di Mnemonic che mi
-interessa di più. È anche quella che rende molto più serio il problema mostrato
-all'inizio.
+L'aspetto importante sta nel passaggio, non nei contenitori. Ed è proprio quel
+passaggio che la riga nascosta all'inizio proverà a sfruttare.
 
 ## Quando una bugia riesce ad avere un passato
 
-Torniamo alla falsa regola bancaria nascosta nella pagina.
-
-Se entra in memoria senza nessuna distinzione, non rimane soltanto una stringa.
+La falsa regola bancaria ora può percorrere la stessa strada. Se entra in
+memoria senza nessuna distinzione, non rimane soltanto una stringa.
 Può ricevere un embedding, collegarsi all'entità ACME, apparire vicino ad altre
 fatture, essere recuperata più volte e quindi acquistare attenzione. Un
 processo di consolidamento troppo ingenuo potrebbe infine trasformarla in
@@ -160,7 +156,7 @@ suo effetto e non deve conoscere la domanda precisa che verrà fatta più avanti
 Gli basta aumentare la probabilità che il ricordo malevolo venga recuperato nel
 momento giusto.
 
-Non è più soltanto uno scenario teorico. OWASP descrive
+La ricerca ha già dato un nome e dei numeri a questo meccanismo. OWASP descrive
 [Memory & Context Poisoning](https://genai.owasp.org/2026/05/13/memory-is-a-feature-it-is-also-an-attack-surface/)
 come contenuto controllato da un attaccante che il sistema continua a trattare
 come affidabile nel tempo. Il lavoro su
@@ -177,10 +173,9 @@ senza controllo, una sola interazione può influenzarne molte altre.
 
 ## Il ricordo deve portarsi dietro la propria storia
 
-Mnemonic non riconosce magicamente ogni bugia e non può dimostrare che una
-frase sia vera. Nessuna architettura di memoria può farlo da sola. Prova invece
-a non distruggere le informazioni che serviranno all'applicazione per
-valutarla.
+La provenienza non è un antivirus e un timestamp non distingue una verità da
+una bugia. Mnemonic non finge il contrario. Cerca invece di non distruggere le
+informazioni che serviranno all'applicazione per valutarla.
 
 Ogni operazione appartiene a una coppia precisa di `namespace` e `scope`.
 Omettere lo scope non significa cercare ovunque. Significa accedere soltanto
@@ -206,15 +201,16 @@ contenuti sospetti. La promozione può richiedere più attenzione, fonti o una
 verifica esterna. Il richiamo può preferire evidenza verificata e mostrare il
 percorso che ha portato a un risultato.
 
-Ma bisogna essere chiari anche sul limite. Se l'applicazione prende il testo di
-una pagina sconosciuta, lo marca come `pinned` e gli assegna confidenza massima,
+Il limite è brutalmente semplice. Se l'applicazione prende il testo di una
+pagina sconosciuta, lo marca come `pinned` e gli assegna confidenza massima,
 Mnemonic conserverà molto bene una pessima decisione. L'architettura rende il
 confine visibile. Non sostituisce chi deve governarlo.
 
 ## Un ricordo non riceve automaticamente le chiavi
 
-C'è poi una separazione ancora più importante. Ricordare una procedura non
-significa autorizzarla.
+Fin qui stiamo ancora parlando di ciò che può entrare nel contesto. Il bonifico
+si trova oltre un altro confine. Ricordare una procedura non significa
+autorizzarla.
 
 Mnemonic può conservare una action recipe, ma quella recipe rimane dato inerte.
 Non viene eseguita perché è stata recuperata e non diventa attendibile perché è
@@ -228,31 +224,30 @@ esegue davvero l'operazione. Anche se un ricordo avvelenato riesce a influenzare
 il ragionamento, non dovrebbe poter trasformare da solo una frase nascosta in
 un bonifico.
 
-Per me i due controlli non sono alternativi. Bisogna proteggere la memoria
-perché influenza ciò che l'Agent pensa, e bisogna proteggere l'esecuzione perché
-prima o poi anche un sistema ben costruito penserà qualcosa di sbagliato.
+Proteggere soltanto uno dei due lati lascia aperto l'altro. La memoria influenza
+ciò che l'Agent pensa, mentre il confine di esecuzione limita ciò che quel
+pensiero può fare. Prima o poi anche un sistema ben costruito penserà qualcosa
+di sbagliato.
 
 ## Dimenticare non è perdere dati per errore
 
-Quando si parla di memoria per Agent, quasi tutta l'attenzione va a quanto
-riesce a conservare. Io credo che un sistema serio debba anche sapere cosa non
-vale più la pena ricordare.
+Un archivio perfetto conserva tutto. Una memoria utile no. Deve anche sapere
+cosa non vale più la pena ricordare.
 
 Nel focus attivo esistono limiti, attenzione e decadimento. I ricordi con una
 finestra temporale possono diventare invisibili quando scadono. `forget` li
 sopprime logicamente insieme alle dipendenze che non devono più riapparire.
 L'eliminazione fisica di una partizione è un'altra operazione, più pesante e
-verificabile. Non ho voluto fingere che nascondere un risultato dalla ricerca
-equivalga a cancellarne ogni byte da store, backup, export e sistemi esterni.
+verificabile. Nascondere un risultato dalla ricerca non equivale a cancellarne
+ogni byte da store, backup, export e sistemi esterni.
 
-Anche questo viene dalla stessa intuizione iniziale. La memoria utile non è
-quella che accumula tutto. È quella che mantiene un rapporto tra attenzione,
-tempo, collegamenti, fiducia e oblio.
+L'oblio chiude il circuito. La memoria utile non è quella che accumula tutto. È
+quella che mantiene un rapporto tra attenzione, tempo, collegamenti, fiducia e
+oblio.
 
-Il problema degli Agent non sarà soltanto ricordare più cose. Sarà impedire che
-ogni frase ricordata diventi una convinzione e che ogni convinzione diventi
-un'azione.
+Se un Agent sbaglia, voglio poter seguire il filo all'indietro. Il bonifico
+viene da una decisione, la decisione da un ricordo e il ricordo da quel `div`
+spostato fuori dallo schermo.
 
-Un Agent può sbagliare. Il sistema attorno dovrebbe almeno essere capace di
-mostrare quale ricordo lo ha portato a sbagliare, da dove arrivava e perché gli
-abbiamo permesso di conservarlo così a lungo.
+Una memoria che non riesce a mostrare questo filo non rende l'Agent più
+intelligente. Rende soltanto l'errore più vecchio.
