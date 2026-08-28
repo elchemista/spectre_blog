@@ -2,7 +2,7 @@
 title: "Il prompt injection che torna dopo un mese"
 slug: "il-prompt-injection-che-torna-dopo-un-mese"
 lang: "it"
-status: draft
+status: published
 date: 2026-08-28
 updated: 2026-08-28
 category: "AI Security"
