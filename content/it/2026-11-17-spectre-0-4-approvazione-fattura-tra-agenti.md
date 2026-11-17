@@ -274,22 +274,37 @@ Il cliente invia la richiesta:
 Il trasporto produce un messaggio `approval.request`. Nella fixture locale lo consegniamo al secondo Server tramite il suo ingresso attendibile:
 
 ~~~elixir
+request_id =
+  receive do
+    {:wire, %{"type" => "approval.request"} = request} ->
+      :ok = Spectre.Server.receive_approval(admin, request)
+  
+      receive do
+        {Spectre.Server, ^admin, {:approval_request, ^request}} ->
+          # UI attendibile: mostra testo originale e scadenza.
+          IO.puts(request["rendered_payload"])
+      end
+  
+      # Soltanto dopo la visualizzazione reale:
+      :ok = Spectre.Server.approval_presented(admin, request["id"])
+    request["id"]
+  end
+~~~
+
+Il test locale deve ora inoltrare il messaggio firmato `approval.presented` al cliente e aspettare che la sua richiesta risulti effettivamente in attesa di consenso:
+
+~~~elixir
 receive do
-  {:wire, %{"type" => "approval.request"} = request} ->
-    :ok = Spectre.Server.receive_approval(admin, request)
+  {:wire, %{"type" => "approval.presented"} = acknowledgement} ->
+    :ok = Spectre.Server.receive_approval(customer, acknowledgement)
+end
 
-    receive do
-      {Spectre.Server, ^admin, {:approval_request, ^request}} ->
-        # UI attendibile: mostra testo originale e scadenza.
-        IO.puts(request["rendered_payload"])
-    end
-
-    # Soltanto dopo la visualizzazione reale:
-    :ok = Spectre.Server.approval_presented(admin, request["id"])
+receive do
+  {Spectre.Server, ^customer, {:pending, _, _}} -> :ok
 end
 ~~~
 
-Il test locale deve inoltrare anche il messaggio firmato `approval.presented` all'ingresso del cliente. Successivamente, **solo dopo un clic umano reale**, la UI invoca:
+**Solo dopo una decisione umana reale**, la UI attendibile invoca:
 
 ~~~elixir
 # Chiamata della UI autenticata, mai del modello:
@@ -298,13 +313,28 @@ Il test locale deve inoltrare anche il messaggio firmato `approval.presented` al
 # :ok = Spectre.Server.approval_decide(admin, request_id, :reject)
 ~~~
 
-Il messaggio firmato `approval.decision` viene consegnato al cliente con `Spectre.Server.receive_approval/2`. In caso di conferma, il Domain del cliente verifica autorità, digest, dati congelati, visualizzazione, firma e scadenza. Solo dopo l'ammissione e il commit dell'Act può partire l'esecutore registrato.
+Il messaggio firmato `approval.decision` viene consegnato al cliente con `Spectre.Server.receive_approval/2`:
+
+~~~elixir
+receive do
+  {:wire, %{"type" => "approval.decision"} = signed_decision} ->
+    {:ok, _} = Spectre.Server.receive_approval(customer, signed_decision)
+end
+~~~
+
+ In caso di conferma, il Domain del cliente verifica autorità, digest, dati congelati, visualizzazione, firma e scadenza. Solo dopo l'ammissione e il commit dell'Act può partire l'esecutore registrato.
 
 Se la persona rifiuta, la continuazione riceve `{:consent, :rejected}` e la fattura non viene spedita.
 
 Il protocollo comprende `approval.request`, `approval.presented`, `approval.decision` e `approval.cancelled`. Non sono messaggi intercambiabili. Una firma falsa, una decisione scaduta o riutilizzata non possono autorizzare un'altra fattura.
 
-Per un test **completo ed eseguibile**, dal checkout di Spectre puoi avviare:
+Per un esempio **specifico della fattura**, con conferma e rifiuto, ho aggiunto uno [script completo nel repository del blog](https://github.com/elchemista/spectre_blog/blob/master/examples/spectre_0_4_external_invoice_approval.exs). Con i repository Spectre e spectre_blog affiancati, esegui dal checkout Spectre 0.4:
+
+~~~sh
+mix run ../spectre_blog/examples/spectre_0_4_external_invoice_approval.exs
+~~~
+
+Lo script simula l'invio e riproduce il flusso di consenso firmato, rifiuto e controllo anti-replay; deriva dalla fixture ufficiale. Puoi anche eseguire il **test originale del core**:
 
 ~~~sh
 mix run docs/examples/external_approval.exs
