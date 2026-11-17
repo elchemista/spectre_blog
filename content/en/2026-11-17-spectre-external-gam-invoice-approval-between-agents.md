@@ -288,7 +288,7 @@ request_id =
   
       # ONLY after real rendering:
       :ok = Spectre.Server.approval_presented(admin, request["id"])
-    request["id"]
+      request["id"]
   end
 ~~~
 
@@ -323,7 +323,7 @@ receive do
 end
 ~~~
 
- For an approved request, its Domain verifies authority, request digest, binding, showing, signature and expiry. It admits and commits the Act before the registered invoice effect can run.
+For an approved request, its Domain verifies authority, request digest, binding, showing, signature and expiry. It admits and commits the Act before the registered invoice effect can run.
 
 For rejection, the original continuation receives `{:consent, :rejected}`; the invoice effect does not run.
 
