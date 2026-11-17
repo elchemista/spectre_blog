@@ -2,7 +2,7 @@
 title: "Spectre 0.4: agenti che lavorano entro un'autorità esplicita"
 slug: "spectre-0-4-agenti-autorita-e-controllo-umano"
 lang: "it"
-status: draft
+status: published
 date: 2026-11-17
 updated: 2026-11-17
 category: "Sviluppo software"
