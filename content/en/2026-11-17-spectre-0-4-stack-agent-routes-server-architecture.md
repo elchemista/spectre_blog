@@ -180,13 +180,13 @@ The [GAM guide](https://github.com/elchemista/spectre/blob/0.4.0/docs/GAM.md) an
 
 One of my favorite properties of Spectre 0.4 is how small it can start.
 
-**Option A — entirely in RAM.** The default AgentServer can run without PostgreSQL, Ledger or any companion package. This is useful for a prototype, a transient assistant or an application that explicitly accepts losing session history on restart.
+**Option A - entirely in RAM.** The default AgentServer can run without PostgreSQL, Ledger or any companion package. This is useful for a prototype, a transient assistant or an application that explicitly accepts losing session history on restart.
 
 ~~~elixir
 gam: [storage: :ephemeral]
 ~~~
 
-**Option B — durable local history.** Select disk storage when you want continuity without deploying a database server:
+**Option B - durable local history.** Select disk storage when you want continuity without deploying a database server:
 
 ~~~elixir
 gam: [storage: {:disk, "var/agents/customer-42"}]
@@ -194,13 +194,13 @@ gam: [storage: {:disk, "var/agents/customer-42"}]
 
 A stable authenticated identity is required for durable storage.
 
-**Option C — PostgreSQL through `spectre_ledger`.** The optional [Ledger package](https://github.com/elchemista/spectre_ledger) integrates coordination, canonical GAM history and a persisted per-record Domain projection. Your application still starts the Repo and applies migrations. Simply installing the package does not magically select a database.
+**Option C - PostgreSQL through `spectre_ledger`.** The optional [Ledger package](https://github.com/elchemista/spectre_ledger) integrates coordination, canonical GAM history and a persisted per-record Domain projection. Your application still starts the Repo and applies migrations. Simply installing the package does not magically select a database.
 
 ~~~elixir
 gam: [storage: :ledger, operations: allowed_operations]
 ~~~
 
-**Option D — your own store.** Implement `Spectre.Server.Store` and connect your own backend:
+**Option D - your own store.** Implement `Spectre.Server.Store` and connect your own backend:
 
 ~~~elixir
 # MyApp.Storage implements @behaviour Spectre.Server.Store.
