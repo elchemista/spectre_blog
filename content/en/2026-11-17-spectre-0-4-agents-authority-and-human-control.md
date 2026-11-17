@@ -2,7 +2,7 @@
 title: "Spectre 0.4: Agents That Work Within Explicit Authority"
 slug: "spectre-0-4-agents-authority-and-human-control"
 lang: "en"
-status: draft
+status: published
 date: 2026-11-17
 updated: 2026-11-17
 category: "Software Development"
