@@ -2,7 +2,7 @@
 title: "One Agent Wants to Send an Invoice. Another Asks the Boss."
 slug: "spectre-external-gam-invoice-approval-between-agents"
 lang: "en"
-status: draft
+status: published
 date: 2026-11-17
 updated: 2026-11-17
 category: "Software Development"
