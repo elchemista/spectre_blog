@@ -2,7 +2,7 @@
 title: "Un agente vuole inviare una fattura. Un altro chiede il permesso al responsabile."
 slug: "spectre-0-4-approvazione-fattura-tra-agenti"
 lang: "it"
-status: draft
+status: published
 date: 2026-11-17
 updated: 2026-11-17
 category: "Sviluppo software"
