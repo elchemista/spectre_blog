@@ -4,13 +4,15 @@ slug: "do-not-trust-the-model-test-spectre-agents-like-software"
 lang: "en"
 status: published
 date: 2026-08-12
-updated: 2026-08-12
+updated: 2026-11-17
 category: "Software Development"
 tags: ["Elixir","ExUnit","AI agents","Spectre","testing","OTP","Policy","idempotency"]
 seo_title: "Test Spectre Agents Without Trusting the Model"
 seo_description: "Learn to test routing, Policies, Effects, crashes, retries, and Morph Candidates in Spectre 0.3.0 by separating deterministic invariants from model evals."
 cover_alt: "An ExUnit suite surrounds a probabilistic model and verifies the deterministic boundaries of a Spectre agent"
 ---
+
+> **Version note — 17 November 2026.** This article predates Spectre 0.4. Its examples and architecture describe the version available at its original publication date. For current AgentServer applications use the [0.4 documentation](/en/docs/overview), [quickstart](/en/docs/getting-started) and [migration guide](/en/docs/migration). The original article remains below as historical context.
 
 An agent produced the correct answer. The test passes.
 

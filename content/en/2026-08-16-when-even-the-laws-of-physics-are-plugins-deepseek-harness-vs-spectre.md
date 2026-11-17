@@ -4,13 +4,15 @@ slug: "deepseek-harness-vs-spectre-plugins-or-kernel"
 lang: "en"
 status: published
 date: 2026-08-16
-updated: 2026-08-16
+updated: 2026-11-17
 category: "Software Development"
 tags: ["AI agents","agent architecture","DeepSeek Harness","Spectre","Elixir","OTP","plugin systems","enterprise AI"]
 seo_title: "DeepSeek Harness vs Spectre: Plugins or Kernel?"
 seo_description: "DeepSeek Harness makes components replaceable through plugins. Spectre keeps a governed kernel. A comparison of composition, authority, state, and recovery."
 cover_alt: "Two Agent architectures compared, one composed entirely from plugins and one built around a governed kernel"
 ---
+
+> **Version note — 17 November 2026.** This article predates Spectre 0.4. Its examples and architecture describe the version available at its original publication date. For current AgentServer applications use the [0.4 documentation](/en/docs/overview), [quickstart](/en/docs/getting-started) and [migration guide](/en/docs/migration). The original article remains below as historical context.
 
 "Everything is a plugin" is an irresistible sentence for a developer.
 

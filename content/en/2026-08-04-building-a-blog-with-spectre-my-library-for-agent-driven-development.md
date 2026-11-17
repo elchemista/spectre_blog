@@ -4,13 +4,15 @@ slug: "building-a-blog-agent-with-spectre"
 lang: "en"
 status: published
 date: 2026-08-04
-updated: 2026-08-04
+updated: 2026-11-17
 category: "Software Development"
 tags: ["Elixir","OTP","AI agents","Spectre","agent runtime","Git-backed blog"]
 seo_title: "Building a Blog Agent with Spectre"
 seo_description: "How I built a Git-backed blog agent with Spectre, keeping model reasoning flexible while flows, state, publishing, and recovery remain explicit."
 cover_alt: "A blog agent built around an explicit OTP runtime, connected to Markdown files, Git history, model reasoning, and controlled publishing"
 ---
+
+> **Version note — 17 November 2026.** This article predates Spectre 0.4. Its examples and architecture describe the version available at its original publication date. For current AgentServer applications use the [0.4 documentation](/en/docs/overview), [quickstart](/en/docs/getting-started) and [migration guide](/en/docs/migration). The original article remains below as historical context.
 
 I did not build Spectre because calling an LLM from Elixir was difficult.
 

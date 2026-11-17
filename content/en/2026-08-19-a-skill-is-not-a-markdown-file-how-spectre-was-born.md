@@ -4,13 +4,15 @@ slug: "skill-is-not-markdown-file-how-spectre-was-born"
 lang: "en"
 status: published
 date: 2026-08-19
-updated: 2026-08-19
+updated: 2026-11-17
 category: "Software Development"
 tags: ["AI agents","skills","Spectre","Elixir","pattern recognition","routing","Morph","agent governance"]
 seo_title: "Beyond Markdown Skills: How Spectre Was Designed"
 seo_description: "Skills are more than instructions. How patterns, Flow, Journal, Ledger, Lab, and Morph shaped the way Spectre recognizes, learns, and evolves."
 cover_alt: "A pattern recognized by the Spectre runtime becomes a governed Skill through Flow, Journal, Ledger, Lab, and Morph"
 ---
+
+> **Version note — 17 November 2026.** This article predates Spectre 0.4. Its examples and architecture describe the version available at its original publication date. For current AgentServer applications use the [0.4 documentation](/en/docs/overview), [quickstart](/en/docs/getting-started) and [migration guide](/en/docs/migration). The original article remains below as historical context.
 
 When I started thinking about how to build an Agent, skills already existed.
 

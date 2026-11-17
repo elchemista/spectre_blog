@@ -4,13 +4,15 @@ slug: "a-turn-is-not-a-model-call-spectre-otp-policies"
 lang: "en"
 status: published
 date: 2026-08-11
-updated: 2026-08-11
+updated: 2026-11-17
 category: "Software Development"
 tags: ["Elixir","OTP","Actor Model","AI agents","Spectre","agent governance","policy"]
 seo_title: "Spectre Turns, Policies and OTP Agent Governance"
 seo_description: "Why Spectre defines a turn as an observable runtime boundary, uses deterministic policies for protected effects, and builds agent ownership on Actors and OTP."
 cover_alt: "A subject-scoped Spectre actor advancing a run to a visible turn boundary, with a deterministic policy separating proposed, approved, and executed effects"
 ---
+
+> **Version note — 17 November 2026.** This article predates Spectre 0.4. Its examples and architecture describe the version available at its original publication date. For current AgentServer applications use the [0.4 documentation](/en/docs/overview), [quickstart](/en/docs/getting-started) and [migration guide](/en/docs/migration). The original article remains below as historical context.
 
 In many agent frameworks, a turn begins when input reaches a model and ends when the model has finished calling tools and produced an answer.
 

@@ -4,13 +4,15 @@ slug: "costruire-un-agente-per-un-blog-con-spectre"
 lang: "it"
 status: published
 date: 2026-08-04
-updated: 2026-08-04
+updated: 2026-11-17
 category: "Sviluppo software"
 tags: ["Elixir","OTP","agenti AI","Spectre","runtime per agenti","blog basato su Git"]
 seo_title: "Costruire un agente per un blog con Spectre"
 seo_description: "Come ho costruito con Spectre un agente per un blog basato su Git, lasciando flessibile il ragionamento del modello e mantenendo espliciti flow, stato, pubblicazione e ripristino."
 cover_alt: "Un agente per un blog costruito attorno a un runtime OTP esplicito, collegato a file Markdown, cronologia Git, ragionamento del modello e pubblicazione controllata"
 ---
+
+> **Nota sulla versione — 17 novembre 2026.** Questo articolo precede Spectre 0.4: esempi e architettura si riferiscono alla versione disponibile alla data di pubblicazione originale. Per le applicazioni AgentServer attuali consulta la [documentazione 0.4](/it/docs/overview), i [primi passi](/it/docs/getting-started) e la [migrazione](/it/docs/migration). Il testo originale resta sotto come riferimento storico.
 
 Non ho costruito Spectre perché fosse difficile chiamare un LLM da Elixir.
 

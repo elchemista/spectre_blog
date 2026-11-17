@@ -4,13 +4,15 @@ slug: "spectre-morph-build-an-agent-that-can-evolve"
 lang: "en"
 status: published
 date: 2026-08-12
-updated: 2026-08-12
+updated: 2026-11-17
 category: "Software Development"
 tags: ["Elixir","OTP","AI agents","Spectre","Morph","runtime skills","governed evolution"]
 seo_title: "Spectre Morph: Build a Self-Modifying Elixir Agent"
 seo_description: "Learn how Spectre 0.3.0 Morph lets an Elixir agent propose, evaluate and activate runtime Skills through chat or admin without gaining code or authority."
 cover_alt: "A Spectre Agent moving from immutable Definition A to evaluated Definition B through a governed Morph proposal"
 ---
+
+> **Version note — 17 November 2026.** This article predates Spectre 0.4. Its examples and architecture describe the version available at its original publication date. For current AgentServer applications use the [0.4 documentation](/en/docs/overview), [quickstart](/en/docs/getting-started) and [migration guide](/en/docs/migration). The original article remains below as historical context.
 
 “A self-modifying agent” usually brings the wrong picture to mind.
 

@@ -4,13 +4,15 @@ slug: "un-turn-non-e-una-chiamata-al-modello-spectre-otp-policy"
 lang: "it"
 status: published
 date: 2026-08-11
-updated: 2026-08-11
+updated: 2026-11-17
 category: "Sviluppo software"
 tags: ["Elixir","OTP","Actor Model","agenti AI","Spectre","governance degli agenti","policy"]
 seo_title: "Turn, Policy e governance OTP degli agenti Spectre"
 seo_description: "Perché Spectre definisce il Turn come confine osservabile, applica Policy deterministiche agli effect protetti e fonda l'ownership su Actor Model e OTP."
 cover_alt: "Un actor Spectre legato a un Subject fa avanzare un Run fino a un confine osservabile, mentre una Policy deterministica separa effect proposto, approvato ed eseguito"
 ---
+
+> **Nota sulla versione — 17 novembre 2026.** Questo articolo precede Spectre 0.4: esempi e architettura si riferiscono alla versione disponibile alla data di pubblicazione originale. Per le applicazioni AgentServer attuali consulta la [documentazione 0.4](/it/docs/overview), i [primi passi](/it/docs/getting-started) e la [migrazione](/it/docs/migration). Il testo originale resta sotto come riferimento storico.
 
 In molti framework per agenti, un turno inizia quando l'input raggiunge un modello e termina quando il modello ha finito di chiamare tool e ha prodotto una risposta.
 

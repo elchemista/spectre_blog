@@ -4,13 +4,15 @@ slug: "getting-started-with-spectre"
 lang: "en"
 status: published
 date: 2026-08-05
-updated: 2026-08-05
+updated: 2026-11-17
 category: "Software Development"
 tags: ["Elixir","OTP","AI agents","Spectre","agent runtime","getting started"]
 seo_title: "Getting Started with Spectre in Elixir"
 seo_description: "An introduction to Spectre: how to think about subjects, instances, runs and turns, and how to build your first agent without hiding the application behind a model."
 cover_alt: "A first Spectre agent: a subject resolved by the host, an OTP instance owning state, and turns crossing a visible boundary"
 ---
+
+> **Updated guidance — 17 November 2026.** This article documents the earlier 0.3 Instance/Run API and remains available as historical context. For new applications use the [Spectre 0.4 AgentServer quickstart](/en/docs/getting-started), following **Stack → Agent → Server**. Existing applications should read the [0.3 → 0.4 migration guide](/en/docs/migration) before upgrading.
 
 Most agent tutorials start with a model call. You send a prompt, describe two tools, print the answer, and the demo works.
 

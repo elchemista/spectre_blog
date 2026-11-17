@@ -4,7 +4,7 @@ slug: "il-tuo-agent-ai-e-pronto-per-il-gdpr"
 lang: "it"
 status: published
 date: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-17
 category: "AI Governance"
 tags:
   [
@@ -25,6 +25,8 @@ cover_alt:
   "Un CEO e un CTO valutano controllo, privacy e governance di un Agent AI
   costruito con Spectre"
 ---
+
+> **Nota sulla versione — 17 novembre 2026.** Questo articolo precede Spectre 0.4: esempi e architettura si riferiscono alla versione disponibile alla data di pubblicazione originale. Per le applicazioni AgentServer attuali consulta la [documentazione 0.4](/it/docs/overview), i [primi passi](/it/docs/getting-started) e la [migrazione](/it/docs/migration). Il testo originale resta sotto come riferimento storico.
 
 La risposta più facile arriva in pochi secondi. Il provider è sicuro, i dati non
 vengono usati per addestrare il modello e sul sito esiste una privacy policy.

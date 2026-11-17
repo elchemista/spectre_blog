@@ -4,13 +4,15 @@ slug: "enterprise-agents-spectre-control-security"
 lang: "en"
 status: published
 date: 2026-08-16
-updated: 2026-08-16
+updated: 2026-11-17
 category: "Software Development"
 tags: ["Elixir","OTP","AI agents","Spectre","enterprise AI","security","audit","testing"]
 seo_title: "Spectre for Governed Enterprise AI Agents"
 seo_description: "See how Spectre 0.3.2 governs enterprise Agents with authority, Policy, recovery, Ledger, and Lab for auditing, debugging, and realistic failure tests."
 cover_alt: "An operations team controls a Spectre Agent with Policies, checkpoints, Receipts, and testing tools before it acts on company systems"
 ---
+
+> **Version note — 17 November 2026.** This article predates Spectre 0.4. Its examples and architecture describe the version available at its original publication date. For current AgentServer applications use the [0.4 documentation](/en/docs/overview), [quickstart](/en/docs/getting-started) and [migration guide](/en/docs/migration). The original article remains below as historical context.
 
 A chatbot that gets an answer wrong creates an awkward conversation.
 
@@ -229,7 +231,7 @@ at nondeterministic or authority boundaries.
 
 The dependencies have their own versions. Ledger `0.1.0` and Lab `0.1.0` are
 not "older" copies of Spectre: those numbers describe separate packages, and
-the current releases explicitly target Core `0.3.2`.
+the releases described in this August 2026 article explicitly target Core `0.3.2`.
 
 ~~~elixir
 defp deps do

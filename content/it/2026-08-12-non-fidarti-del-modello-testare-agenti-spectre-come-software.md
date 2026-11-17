@@ -4,13 +4,15 @@ slug: "non-fidarti-del-modello-testare-agenti-spectre-come-software"
 lang: "it"
 status: published
 date: 2026-08-12
-updated: 2026-08-12
+updated: 2026-11-17
 category: "Sviluppo software"
 tags: ["Elixir","ExUnit","agenti AI","Spectre","testing","OTP","Policy","idempotenza"]
 seo_title: "Testare agenti Spectre senza fidarsi del modello"
 seo_description: "Scopri come testare routing, Policy, Effect, crash, retry e Candidate Morph in Spectre 0.3.0 separando invarianti deterministiche ed eval del modello."
 cover_alt: "Una suite ExUnit circonda un modello probabilistico e verifica i confini deterministici di un agente Spectre"
 ---
+
+> **Nota sulla versione — 17 novembre 2026.** Questo articolo precede Spectre 0.4: esempi e architettura si riferiscono alla versione disponibile alla data di pubblicazione originale. Per le applicazioni AgentServer attuali consulta la [documentazione 0.4](/it/docs/overview), i [primi passi](/it/docs/getting-started) e la [migrazione](/it/docs/migration). Il testo originale resta sotto come riferimento storico.
 
 Un agente ha prodotto la risposta corretta. Il test passa.
 

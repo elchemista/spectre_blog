@@ -4,13 +4,15 @@ slug: "beam-vm-elixir-serious-ai-agents"
 lang: "en"
 status: published
 date: 2026-08-22
-updated: 2026-08-22
+updated: 2026-11-17
 category: "Software Development"
 tags: ["BEAM VM","Elixir","Erlang","OTP","AI agents","fault tolerance","concurrency","Spectre"]
 seo_title: "Why BEAM and Elixir Fit Serious AI Agents"
 seo_description: "BEAM was not built for AI, but isolated processes, supervision, messages, and OTP make it a strong foundation for serious Agent systems."
 cover_alt: "An AI Agent running through supervised Elixir processes on the BEAM VM"
 ---
+
+> **Version note — 17 November 2026.** This article predates Spectre 0.4. Its examples and architecture describe the version available at its original publication date. For current AgentServer applications use the [0.4 documentation](/en/docs/overview), [quickstart](/en/docs/getting-started) and [migration guide](/en/docs/migration). The original article remains below as historical context.
 
 When I started building Spectre, choosing Elixir for a project connected to
 artificial intelligence felt almost provocative.

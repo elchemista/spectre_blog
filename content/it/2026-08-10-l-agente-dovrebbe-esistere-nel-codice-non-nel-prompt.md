@@ -4,13 +4,15 @@ slug: "l-agente-dovrebbe-esistere-nel-codice-non-nel-prompt"
 lang: "it"
 status: published
 date: 2026-08-10
-updated: 2026-08-10
+updated: 2026-11-17
 category: "Sviluppo software"
 tags: ["Elixir","OTP","agenti AI","Spectre","prompt injection","sicurezza degli agenti"]
 seo_title: "Perché gli agenti Spectre esistono nel codice, non nei prompt"
 seo_description: "Perché Spectre mantiene comportamento, permessi, ciclo di vita e stato dell'agente in codice eseguibile invece di trattare un system prompt come sorgente della verità."
 cover_alt: "Un agente Spectre in cui il prompt fornisce il ragionamento, mentre flow compilati, policy, skill e stato operativo formano un confine eseguibile di protezione"
 ---
+
+> **Nota sulla versione — 17 novembre 2026.** Questo articolo precede Spectre 0.4: esempi e architettura si riferiscono alla versione disponibile alla data di pubblicazione originale. Per le applicazioni AgentServer attuali consulta la [documentazione 0.4](/it/docs/overview), i [primi passi](/it/docs/getting-started) e la [migrazione](/it/docs/migration). Il testo originale resta sotto come riferimento storico.
 
 La maggior parte degli agenti esiste principalmente dentro un prompt.
 

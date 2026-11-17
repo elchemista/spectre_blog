@@ -4,13 +4,15 @@ slug: "spectre-news-agent-lens-kinetic-action-language"
 lang: "en"
 status: published
 date: 2026-08-12
-updated: 2026-08-12
+updated: 2026-11-17
 category: "Software Development"
 tags: ["Elixir","OTP","AI agents","Spectre","Spectre Lens","Spectre Kinetic","Action Language","web research"]
 seo_title: "Build a Spectre News Agent with Lens and Kinetic"
 seo_description: "Build a Spectre Skill that researches news with Lens, treats Web content as untrusted, maps @al with Kinetic, and emails only after Policy approval."
 cover_alt: "A Spectre news Agent uses Lens to observe untrusted Web sources, Kinetic to form an email Action, and a Policy to authorize delivery"
 ---
+
+> **Version note — 17 November 2026.** This article predates Spectre 0.4. Its examples and architecture describe the version available at its original publication date. For current AgentServer applications use the [0.4 documentation](/en/docs/overview), [quickstart](/en/docs/getting-started) and [migration guide](/en/docs/migration). The original article remains below as historical context.
 
 Many agent demos end when the model calls a function.
 

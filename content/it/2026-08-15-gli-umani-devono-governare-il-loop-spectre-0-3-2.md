@@ -4,13 +4,15 @@ slug: "umani-governano-loop-spectre-streaming-0-3-2"
 lang: "it"
 status: published
 date: 2026-08-15
-updated: 2026-08-15
+updated: 2026-11-17
 category: "Sviluppo software"
 tags: ["Elixir","OTP","agenti AI","Spectre","streaming AI","human in the loop","governance","sistemi distribuiti"]
 seo_title: "Governare agenti AI con Spectre 0.3.2"
 seo_description: "Scopri come Spectre 0.3.2 governa inferenza e streaming con Instance, steering, budget, recovery, Receipt, Policy e confini umani espliciti in Elixir."
 cover_alt: "Un operatore governa un Agent Spectre durante un'analisi di incidente, osservando streaming provvisorio, budget, steering e Result canonico"
 ---
+
+> **Nota sulla versione — 17 novembre 2026.** Questo articolo precede Spectre 0.4: esempi e architettura si riferiscono alla versione disponibile alla data di pubblicazione originale. Per le applicazioni AgentServer attuali consulta la [documentazione 0.4](/it/docs/overview), i [primi passi](/it/docs/getting-started) e la [migrazione](/it/docs/migration). Il testo originale resta sotto come riferimento storico.
 
 Abbiamo costruito Agent capaci di lavorare per ore.
 

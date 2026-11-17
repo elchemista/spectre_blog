@@ -4,13 +4,15 @@ slug: "il-prompt-injection-che-torna-dopo-un-mese"
 lang: "it"
 status: published
 date: 2026-08-28
-updated: 2026-08-28
+updated: 2026-11-17
 category: "AI Security"
 tags: ["Spectre Mnemonic","memory poisoning","prompt injection","AI agents","agent memory","Elixir"]
 seo_title: "Memory poisoning: il prompt injection che torna dopo un mese"
 seo_description: "Un prompt injection può entrare nella memoria di un Agent e riapparire settimane dopo. Memoria veloce, consolidamento, provenienza e governance in Spectre Mnemonic."
 cover_alt: "Un'istruzione nascosta in una pagina web attraversa i diversi strati della memoria di un Agent e riappare molto tempo dopo"
 ---
+
+> **Nota sulla versione — 17 novembre 2026.** Questo articolo precede Spectre 0.4: esempi e architettura si riferiscono alla versione disponibile alla data di pubblicazione originale. Per le applicazioni AgentServer attuali consulta la [documentazione 0.4](/it/docs/overview), i [primi passi](/it/docs/getting-started) e la [migrazione](/it/docs/migration). Il testo originale resta sotto come riferimento storico.
 
 ```html
 <div style="position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden">
