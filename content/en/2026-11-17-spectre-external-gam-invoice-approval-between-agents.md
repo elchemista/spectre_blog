@@ -275,22 +275,37 @@ Now the customer asks to send the invoice:
 The transport sends an `approval.request`. In the local fixture we hand the message to the second Server via its authenticated ingress:
 
 ~~~elixir
+request_id =
+  receive do
+    {:wire, %{"type" => "approval.request"} = request} ->
+      :ok = Spectre.Server.receive_approval(admin, request)
+  
+      receive do
+        {Spectre.Server, ^admin, {:approval_request, ^request}} ->
+          # Trusted UI: display the literal frozen request and expiry.
+          IO.puts(request["rendered_payload"])
+      end
+  
+      # ONLY after real rendering:
+      :ok = Spectre.Server.approval_presented(admin, request["id"])
+    request["id"]
+  end
+~~~
+
+The local demo must now return the signed `approval.presented` acknowledgement to the customer and wait for the customer's consent-pending state:
+
+~~~elixir
 receive do
-  {:wire, %{"type" => "approval.request"} = request} ->
-    :ok = Spectre.Server.receive_approval(admin, request)
+  {:wire, %{"type" => "approval.presented"} = acknowledgement} ->
+    :ok = Spectre.Server.receive_approval(customer, acknowledgement)
+end
 
-    receive do
-      {Spectre.Server, ^admin, {:approval_request, ^request}} ->
-        # Trusted UI: display the literal frozen request and expiry.
-        IO.puts(request["rendered_payload"])
-    end
-
-    # ONLY after real rendering:
-    :ok = Spectre.Server.approval_presented(admin, request["id"])
+receive do
+  {Spectre.Server, ^customer, {:pending, _, _}} -> :ok
 end
 ~~~
 
-The local demo must also return the signed `approval.presented` message to the customer's trusted ingress. Then, **after a real human click**, the UI calls:
+**Only after an actual human choice** does the trusted UI call:
 
 ~~~elixir
 # Called by trusted UI code, never by the model:
@@ -299,13 +314,28 @@ The local demo must also return the signed `approval.presented` message to the c
 # :ok = Spectre.Server.approval_decide(admin, request_id, :reject)
 ~~~
 
-The signed `approval.decision` is delivered back to the customer via `Spectre.Server.receive_approval/2`. For an approved request, its Domain verifies authority, request digest, binding, showing, signature and expiry. It admits and commits the Act before the registered invoice effect can run.
+The signed `approval.decision` is delivered back to the customer via `Spectre.Server.receive_approval/2`:
+
+~~~elixir
+receive do
+  {:wire, %{"type" => "approval.decision"} = signed_decision} ->
+    {:ok, _} = Spectre.Server.receive_approval(customer, signed_decision)
+end
+~~~
+
+ For an approved request, its Domain verifies authority, request digest, binding, showing, signature and expiry. It admits and commits the Act before the registered invoice effect can run.
 
 For rejection, the original continuation receives `{:consent, :rejected}`; the invoice effect does not run.
 
 The wire protocol has four message kinds: `approval.request`, `approval.presented`, `approval.decision` and `approval.cancelled`. They are not interchangeable. A forged, stale or replayed decision cannot authorize a different invoice.
 
-For a **complete executable confirm-and-reject test**, run the official core example:
+For a complete **invoice-specific** confirm-and-reject walkthrough, see the [companion demo fixture](https://github.com/elchemista/spectre_blog/blob/master/examples/spectre_0_4_external_invoice_approval.exs). With the Spectre and spectre_blog repositories side by side, run from the Spectre 0.4 checkout:
+
+~~~sh
+mix run ../spectre_blog/examples/spectre_0_4_external_invoice_approval.exs
+~~~
+
+The fixture simulates invoice delivery and exercises signed consent, refusal and replay checks; it is adapted from the official core example. You can also run the **original, tested core fixture**:
 
 ~~~sh
 mix run docs/examples/external_approval.exs
