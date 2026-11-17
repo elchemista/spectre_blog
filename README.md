@@ -6,10 +6,18 @@ Articles live under `content/<language>/` and follow ExBlog's Markdown/frontmatt
 
 The current application architecture is **Stack → Agent → Server**, with GAM (Governed Act Model) mediating the application's declared consequences. Read the [English documentation](https://spectre.guide/en/docs/overview) or [documentazione italiana](https://spectre.guide/it/docs/overview), then the [0.3 → 0.4 migration guide](https://spectre.guide/en/docs/migration) before upgrading an older application.
 
-The new release article is under editorial review and remains a draft:
+## Spectre 0.4 editorial series (drafts)
 
-- [English: agents, authority and human control](content/en/2026-11-17-spectre-0-4-agents-authority-and-human-control.md)
-- [Italiano: agenti, autorità e controllo umano](content/it/2026-11-17-spectre-0-4-agenti-autorita-e-controllo-umano.md)
+The release overview and three companion deep dives are in English and Italian. All remain `status: draft` until an explicit editorial publishing action.
+
+| Topic | English | Italiano |
+| --- | --- | --- |
+| Release overview: agents, authority and control | [Read draft](content/en/2026-11-17-spectre-0-4-agents-authority-and-human-control.md) | [Leggi la bozza](content/it/2026-11-17-spectre-0-4-agenti-autorita-e-controllo-umano.md) |
+| New ergonomics: Stack, Agent routes, Server, RAM and storage | [Read draft](content/en/2026-11-17-spectre-0-4-stack-agent-routes-server-architecture.md) | [Leggi la bozza](content/it/2026-11-17-spectre-0-4-stack-agent-route-server-architettura.md) |
+| Why GAM exists: Mandate, Evidence, Act, Duty | [Read draft](content/en/2026-11-17-why-i-created-gam-governed-act-model.md) | [Leggi la bozza](content/it/2026-11-17-perche-ho-creato-gam-governed-act-model.md) |
+| External approval: invoice request between two agents | [Read draft](content/en/2026-11-17-spectre-external-gam-invoice-approval-between-agents.md) | [Leggi la bozza](content/it/2026-11-17-spectre-0-4-approvazione-fattura-tra-agenti.md) |
+
+A [companion Elixir invoice approval fixture](examples/spectre_0_4_external_invoice_approval.exs) adapts the core external-approval test to a *simulated* invoice operation. Run it from a Spectre 0.4 checkout with `mix run /path/to/spectre_blog/examples/spectre_0_4_external_invoice_approval.exs`. It does not send a real invoice.
 
 ## Historical articles
 
