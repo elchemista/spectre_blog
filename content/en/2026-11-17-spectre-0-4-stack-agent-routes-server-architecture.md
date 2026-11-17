@@ -2,7 +2,7 @@
 title: "Spectre 0.4: Your Agent Is More Than a Tool Loop"
 slug: "spectre-0-4-stack-agent-routes-server-architecture"
 lang: "en"
-status: draft
+status: published
 date: 2026-11-17
 updated: 2026-11-17
 category: "Software Development"
