@@ -2,7 +2,7 @@
 title: "Why I Created GAM: An AI Agent Needs Authority, Not Just Tools"
 slug: "why-i-created-gam-governed-act-model"
 lang: "en"
-status: draft
+status: published
 date: 2026-11-17
 updated: 2026-11-17
 category: "Software Development"
