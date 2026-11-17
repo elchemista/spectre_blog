@@ -263,7 +263,7 @@ Even though these agents can use the same transport, they have **different GAM D
 
 The `mandate_ref` here identifies authorization established by the trusted host for approval. It is not a transferable superpower or a remotely imported execution mandate.
 
-## Show, acknowledge and decide — in that order
+## Show, acknowledge and decide - in that order
 
 Now the customer asks to send the invoice:
 
@@ -357,7 +357,7 @@ That is the property I care about most: **another agent may help you decide, but
 
 ## Turning this demo into a production workflow
 
-You will need a real authenticated human login, stable signing keys, an authorized approver registry, secure message ingress and a transport appropriate to the deployment. Add durable storage for coordination and GAM history—`spectre_ledger`/PostgreSQL or your own `Spectre.Server.Store`—when restart continuity matters.
+You will need a real authenticated human login, stable signing keys, an authorized approver registry, secure message ingress and a transport appropriate to the deployment. Add durable storage for coordination and GAM history-`spectre_ledger`/PostgreSQL or your own `Spectre.Server.Store`-when restart continuity matters.
 
 The production effect adapter needs actual invoice-provider credentials, a durable invoice identifier, provider-specific deduplication and reconciliation of ambiguous outcomes. Keep credentials out of prompts and model output. Allow only registered operations through the governed path; direct HTTP calls from an ordinary Server callback bypass this guarantee.
 
