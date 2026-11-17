@@ -287,7 +287,7 @@ request_id =
   
       # Soltanto dopo la visualizzazione reale:
       :ok = Spectre.Server.approval_presented(admin, request["id"])
-    request["id"]
+      request["id"]
   end
 ~~~
 
@@ -322,7 +322,7 @@ receive do
 end
 ~~~
 
- In caso di conferma, il Domain del cliente verifica autorità, digest, dati congelati, visualizzazione, firma e scadenza. Solo dopo l'ammissione e il commit dell'Act può partire l'esecutore registrato.
+In caso di conferma, il Domain del cliente verifica autorità, digest, dati congelati, visualizzazione, firma e scadenza. Solo dopo l'ammissione e il commit dell'Act può partire l'esecutore registrato.
 
 Se la persona rifiuta, la continuazione riceve `{:consent, :rejected}` e la fattura non viene spedita.
 
