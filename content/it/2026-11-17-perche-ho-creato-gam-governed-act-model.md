@@ -2,7 +2,7 @@
 title: "Perché ho creato GAM: un agente AI ha bisogno di autorità, non solo di tool"
 slug: "perche-ho-creato-gam-governed-act-model"
 lang: "it"
-status: draft
+status: published
 date: 2026-11-17
 updated: 2026-11-17
 category: "Sviluppo software"
