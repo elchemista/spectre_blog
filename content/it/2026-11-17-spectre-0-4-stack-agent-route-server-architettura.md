@@ -181,13 +181,13 @@ Approfondimenti: [GAM](https://github.com/elchemista/spectre/blob/0.4.0/docs/GAM
 
 Questa è una delle caratteristiche della 0.4 che preferisco: puoi iniziare davvero in piccolo.
 
-**Opzione A — tutto in RAM.** AgentServer funziona senza PostgreSQL, Ledger o package aggiuntivi. È utile per prototipi, assistenti temporanei o dove perdere la storia al riavvio è una scelta accettabile.
+**Opzione A - tutto in RAM.** AgentServer funziona senza PostgreSQL, Ledger o package aggiuntivi. È utile per prototipi, assistenti temporanei o dove perdere la storia al riavvio è una scelta accettabile.
 
 ~~~elixir
 gam: [storage: :ephemeral]
 ~~~
 
-**Opzione B — persistenza su disco.** Puoi mantenere una storia durevole senza installare un server database:
+**Opzione B - persistenza su disco.** Puoi mantenere una storia durevole senza installare un server database:
 
 ~~~elixir
 gam: [storage: {:disk, "var/agents/customer-42"}]
@@ -195,13 +195,13 @@ gam: [storage: {:disk, "var/agents/customer-42"}]
 
 Per la persistenza serve un'identità stabile ed esplicita.
 
-**Opzione C — PostgreSQL con `spectre_ledger`.** Il package opzionale [Ledger](https://github.com/elchemista/spectre_ledger) fornisce coordinamento, storia canonica GAM e una proiezione persistente per-record del Domain. L'applicazione avvia Repo e applica le migrazioni: installare Ledger, da solo, non attiva automaticamente il database.
+**Opzione C - PostgreSQL con `spectre_ledger`.** Il package opzionale [Ledger](https://github.com/elchemista/spectre_ledger) fornisce coordinamento, storia canonica GAM e una proiezione persistente per-record del Domain. L'applicazione avvia Repo e applica le migrazioni: installare Ledger, da solo, non attiva automaticamente il database.
 
 ~~~elixir
 gam: [storage: :ledger, operations: allowed_operations]
 ~~~
 
-**Opzione D — il tuo Store.** Puoi implementare `Spectre.Server.Store` e collegare un backend proprietario:
+**Opzione D - il tuo Store.** Puoi implementare `Spectre.Server.Store` e collegare un backend proprietario:
 
 ~~~elixir
 # MyApp.Storage implementa @behaviour Spectre.Server.Store.
